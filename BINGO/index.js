@@ -1,107 +1,174 @@
-var boardNumbers = [];
-var pickedNumbers = [];
+var jogadores = [];
+var intervalo;
 var sorteioEmAndamento = false;
 
-function gerarCartela() {
-    if (sorteioEmAndamento) {
-        alert("Não é possível gerar uma nova cartela enquanto o sorteio estiver em andamento.");
-        return;
+function gerarNumerosAleatorios(quantidade, min, max) {
+  if (quantidade > max - min) {
+    console.log("Intervalo insuficiente ...");
+    return;
+  }
+
+  var numeros = [];
+
+  while (numeros.length < quantidade) {
+    var aleatorio = Math.floor(Math.random() * (max - min) + min);
+
+    if (!numeros.includes(aleatorio)) {
+      numeros.push(aleatorio);
     }
+  }
 
-    nomeJogador = prompt("Insira o nome do jogador:");
-    if (!nomeJogador) {
-        alert("Por favor, insira um nome válido.");
-        return;
-    }
-
-    boardNumbers = [];
-
-    while (boardNumbers.length < 25) {
-        var numero = Math.floor(Math.random() * 75) + 1;
-        if (boardNumbers.indexOf(numero) === -1) {
-            boardNumbers.push(numero);
-        }
-    }
-
-    exibirCartela(nomeJogador);
+  return numeros;
 }
 
-function exibirCartela(nomeJogador) {
-    var cartela = document.getElementById("cartela-bingo");
-    cartela.innerHTML = "";
+function gerarCartela() {
+  if (sorteioEmAndamento) {
+    alert("A criação das cartelas não é permitida durante o sorteio de números.");
+    return;
+  }
 
-    for (var i = 0; i < boardNumbers.length; i++) {
-        var quadrado = document.createElement("div");
-        quadrado.className = "square";
-        
-        var circulo = document.createElement("div");
-        circulo.className = "circle";
-        circulo.textContent = boardNumbers[i];
+  var nomeJogador = prompt("Digite o nome do jogador");
 
-        quadrado.setAttribute("data-number", boardNumbers[i]);
-        quadrado.appendChild(circulo);
+  var cartela = [
+    gerarNumerosAleatorios(5, 1, 15),
+    gerarNumerosAleatorios(5, 16, 30),
+    gerarNumerosAleatorios(5, 31, 45),
+    gerarNumerosAleatorios(5, 46, 60),
+    gerarNumerosAleatorios(5, 61, 75)
+  ];
 
-        cartela.appendChild(quadrado);
+  jogadores.push({
+    nomeJogador: nomeJogador,
+    cartela: cartela
+  });
+
+  desenharJogador(nomeJogador, cartela);
+
+  console.log(jogadores);
+}
+
+function desenharJogador(nome, cartela) {
+  var div = document.getElementById("espaco_cartelas");
+
+  var jogadorDiv = document.createElement("div");
+  jogadorDiv.classList.add("jogador");
+
+  var nomeJogadorDiv = document.createElement("div");
+  nomeJogadorDiv.innerText = nome;
+  jogadorDiv.appendChild(nomeJogadorDiv);
+
+  var tabela = document.createElement("table");
+  tabela.classList.add("cartela");
+
+  var thead = document.createElement("thead");
+
+  var thB = document.createElement("th");
+  thB.innerText = "B";
+  var thI = document.createElement("th");
+  thI.innerText = "I";
+  var thN = document.createElement("th");
+  thN.innerText = "N";
+  var thG = document.createElement("th");
+  thG.innerText = "G";
+  var thO = document.createElement("th");
+  thO.innerText = "O";
+
+  thead.appendChild(thB);
+  thead.appendChild(thI);
+  thead.appendChild(thN);
+  thead.appendChild(thG);
+  thead.appendChild(thO);
+
+  for (var i = 0; i < 5; i++) {
+    var tr = document.createElement("tr");
+    for (var j = 0; j < 5; j++) {
+      var td = document.createElement("td");
+      if (i === 2 && j === 2) {
+        td.innerText = "X";
+        tr.appendChild(td);
+      } else {
+        td.innerText = cartela[j][i];
+        tr.appendChild(td);
+      }
     }
+    tabela.appendChild(tr);
+  }
 
-    document.getElementById("nome-jogador").textContent = nomeJogador;
+  tabela.appendChild(thead);
+  jogadorDiv.appendChild(tabela);
+  div.appendChild(jogadorDiv);
 }
 
 function iniciarJogo() {
-    if (sorteioEmAndamento) {
-        alert("O sorteio já está em andamento. Aguarde o término.");
-        return;
+  if (intervalo) {
+    alert("O sorteio dos números já está em andamento.");
+    return;
+  }
+
+  if (jogadores.length === 0) {
+    alert("É preciso criar as cartelas antes de iniciar o jogo.");
+    return;
+  }
+
+  sorteioEmAndamento = true;
+
+  var numerosSorteadosDiv = document.getElementById("numeros-sorteados");
+  numerosSorteadosDiv.innerHTML = "";
+
+  var numerosSorteados = [];
+  var numeroSorteado = 0;
+  intervalo = setInterval(function() {
+    do {
+      numeroSorteado = Math.floor(Math.random() * 75) + 1;
+    } while (numerosSorteados.includes(numeroSorteado));
+
+    numerosSorteados.push(numeroSorteado);
+    numerosSorteadosDiv.innerHTML += numeroSorteado + ", ";
+
+    marcarNumeroSorteado(numeroSorteado);
+
+    if (numerosSorteados.length === 75) {
+      clearInterval(intervalo);
+      intervalo = null;
+      console.log("Todos os números foram sorteados.");
+      sorteioEmAndamento = false;
     }
-
-    if (boardNumbers.length === 0) {
-        alert("Por favor, gere uma cartela antes de iniciar o jogo!");
-        return;
-    }
-
-    var numerosSorteadosContainer = document.getElementById("numeros-sorteados");
-    pickedNumbers = [];
-    sorteioEmAndamento = true;
-
-    intervalo = setInterval(function() {
-        var numero = Math.floor(Math.random() * 75) + 1;
-
-        if (pickedNumbers.indexOf(numero) === -1) {
-            pickedNumbers.push(numero);
-            numerosSorteadosContainer.textContent = pickedNumbers.join(", ");
-
-            var quadrado = document.querySelector(".square[data-number='" + numero + "']");
-            if (quadrado) {
-                quadrado.classList.add("picked");
-
-                if (boardNumbers.includes(numero)) {
-                    quadrado.classList.add("matched");
-                }
-            }
-
-            if (pickedNumbers.length === 75) {
-                clearInterval(intervalo);
-                sorteioEmAndamento = false;
-                alert("Todos os números foram sorteados!");
-            }
-        }
-    }, 100);
+  }, 100);
 }
 
 function reiniciarJogo() {
-    if (sorteioEmAndamento) {
-        clearInterval(intervalo);
-        sorteioEmAndamento = false;
-    }
+  if (intervalo) {
+    clearInterval(intervalo);
+    intervalo = null;
+    console.log("Sorteio dos números interrompido.");
+  }
 
-    pickedNumbers = [];
-    var numerosSorteadosContainer = document.getElementById("numeros-sorteados");
-    numerosSorteadosContainer.textContent = "";
+  jogadores = [];
 
-    var quadrados = document.querySelectorAll(".square");
-    quadrados.forEach(function(quadrado) {
-        quadrado.classList.remove("picked");
-        quadrado.classList.remove("matched");
-    });
+  var numerosSorteadosDiv = document.getElementById("numeros-sorteados");
+  numerosSorteadosDiv.innerHTML = "";
 
-    exibirCartela(nomeJogador);
+  var espacoCartelasDiv = document.getElementById("espaco_cartelas");
+  espacoCartelasDiv.innerHTML = "";
+
+  console.log("Jogo reiniciado.");
+
+  sorteioEmAndamento = false;
 }
+
+function marcarNumeroSorteado(numero) {
+    var cartelas = document.getElementsByClassName("cartela");
+  
+    for (var i = 0; i < cartelas.length; i++) {
+      var celulas = cartelas[i].getElementsByTagName("td");
+  
+      for (var j = 0; j < celulas.length; j++) {
+        if (celulas[j].innerText === numero.toString()) {
+          celulas[j].classList.add("sorteado");
+        }
+      }
+    }
+}
+  
+
+   
