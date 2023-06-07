@@ -1,7 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;700;900&display=swap');
 
 body {
-    margin: 10px 0 0 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    margin-bottom: 50px;
 }
 
 * {
@@ -14,7 +17,7 @@ body {
 }
 
 header {
-    background-color: lightgrey;
+    background-color: lightskyblue;
     height: 60px;
     width: 100%;
     display: flex;
@@ -34,42 +37,13 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: lightgrey;
+    background-color: lightskyblue;
 }
 
 .container {
-    margin-left: 50px;
-    flex-direction: 1;
+    flex-wrap: wrap;
     display: flex;
     justify-content: space-around;
-}
-
-.jogo {
-    flex-direction: column;
-    display: flex;
-}
-
-#bingo-game {
-    display: flex;
-    flex-direction: column;
-}
-
-.picked {
-    background-color: lightgreen;
-}
-
-.matched {
-    color: white;
-    background-color: green;
-}
-
-#nome-jogador {
-    margin-top: 20px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 400px;
 }
 
 #gerar {
@@ -154,13 +128,9 @@ footer {
     text-align: center;
     font-size: 26px;
     font-weight: bold;
+    background-color: gray;
 }
 
 .sorteado {
     background-color: green;
-}
-
-.container-cartelas {
-    display: flex;
-    flex-wrap: wrap;
 }

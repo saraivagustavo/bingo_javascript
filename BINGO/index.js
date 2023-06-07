@@ -42,18 +42,18 @@ function gerarCartela() {
     cartela: cartela
   });
 
-  desenharJogador(nomeJogador, cartela);
+  desenharCartela(nomeJogador, cartela);
 
   console.log(jogadores);
 }
 
-function desenharJogador(nome, cartela) {
-  var div = document.getElementById("espaco_cartelas");
+function desenharCartela(nome, cartela) {
+  var div = document.getElementById("espaco-cartelas");
 
   var jogadorDiv = document.createElement("div");
   jogadorDiv.classList.add("jogador");
 
-  var nomeJogadorDiv = document.createElement("div");
+  var nomeJogadorDiv = document.createElement("h3");
   nomeJogadorDiv.innerText = nome;
   jogadorDiv.appendChild(nomeJogadorDiv);
 
@@ -127,6 +127,10 @@ function iniciarJogo() {
 
     marcarNumeroSorteado(numeroSorteado);
 
+    if(verificarGanhador(numerosSorteados)){
+      break;
+    }
+
     if (numerosSorteados.length === 75) {
       clearInterval(intervalo);
       intervalo = null;
@@ -148,7 +152,7 @@ function reiniciarJogo() {
   var numerosSorteadosDiv = document.getElementById("numeros-sorteados");
   numerosSorteadosDiv.innerHTML = "";
 
-  var espacoCartelasDiv = document.getElementById("espaco_cartelas");
+  var espacoCartelasDiv = document.getElementById("espaco-cartelas");
   espacoCartelasDiv.innerHTML = "";
 
   console.log("Jogo reiniciado.");
@@ -169,6 +173,19 @@ function marcarNumeroSorteado(numero) {
       }
     }
 }
-  
 
-   
+function verificarGanhador(numerosSorteados){
+  jogadores.forEach(function(jogador){
+    var quantidade = 0;
+    for(var i = 0; i < jogador.cartela,length; i++){
+      for(var j = 0; j < numerosSorteados.length; j++){
+        if(jogador.cartela[i] == numerosSorteados[j]){
+          quantidade++;
+        }
+      }
+    }
+    if(quantidade == 24){
+      return true;
+    }
+  })
+}
