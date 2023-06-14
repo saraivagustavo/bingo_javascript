@@ -154,7 +154,7 @@ function iniciarJogo() {
       var nomesGanhadores = ganhadores.map(function(jogador) {
         return jogador.nomeJogador;
       });
-      alert("O jogador " + nomesGanhadores[0] + " venceu!");
+      alert("Os jogadores vencedores são: " + nomesGanhadores.join(", "));
       sorteioEmAndamento = false;
     }
 
@@ -169,7 +169,6 @@ function iniciarJogo() {
     }
   }, 100);
 }
-
 
 function reiniciarJogo() {
   if (intervalo) {
