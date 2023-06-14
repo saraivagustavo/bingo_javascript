@@ -1,6 +1,7 @@
 var jogadores = [];
 var intervalo;
 var sorteioEmAndamento = false;
+var numerosCartela = [];
 
 function gerarNumerosAleatorios(quantidade, min, max) {
   if (quantidade > max - min) {
@@ -27,7 +28,21 @@ function gerarCartela() {
     return;
   }
 
-  var nomeJogador = prompt("Digite o nome do jogador");
+  var nomeJogador = prompt("Digite o nome do jogador:");
+
+  if (!nomeJogador || nomeJogador.trim() === "") {
+    alert("Não é possível gerar a cartela sem o nome do jogador.");
+    return;
+  }
+
+  var jogadorExistente = jogadores.find(function(jogador) {
+    return jogador.nomeJogador === nomeJogador;
+  });
+
+  if (jogadorExistente) {
+    alert("Já existe um jogador com esse nome. Escolha um nome diferente.");
+    return;
+  }
 
   var cartela = [
     gerarNumerosAleatorios(5, 1, 15),
@@ -100,7 +115,12 @@ function desenharCartela(nome, cartela) {
 }
 
 function iniciarJogo() {
-  if (intervalo) {
+  if (jogadores.length < 2) {
+    alert("É necessário pelo menos dois jogadores para iniciar o jogo.");
+    return;
+  }
+
+  if (sorteioEmAndamento) {
     alert("O sorteio dos números já está em andamento.");
     return;
   }
@@ -112,33 +132,44 @@ function iniciarJogo() {
 
   sorteioEmAndamento = true;
 
-  var numerosSorteadosDiv = document.getElementById("numeros-sorteados");
-  numerosSorteadosDiv.innerHTML = "";
+  var numerosCartelaDiv = document.getElementById("numeros-sorteados");
+  numerosCartelaDiv.innerHTML = "";
 
-  var numerosSorteados = [];
+  numerosCartela = [];
   var numeroSorteado = 0;
   intervalo = setInterval(function() {
     do {
       numeroSorteado = Math.floor(Math.random() * 75) + 1;
-    } while (numerosSorteados.includes(numeroSorteado));
+    } while (numerosCartela.includes(numeroSorteado));
 
-    numerosSorteados.push(numeroSorteado);
-    numerosSorteadosDiv.innerHTML += numeroSorteado + ", ";
+    numerosCartela.push(numeroSorteado);
+    numerosCartelaDiv.innerHTML += "<div class='numero-sorteado'>" + numeroSorteado + "</div>";
 
     marcarNumeroSorteado(numeroSorteado);
 
-    if(verificarGanhador(numerosSorteados)){
-      break;
+    var ganhadores = verificarGanhadores();
+
+    if (ganhadores.length > 0) {
+      clearInterval(intervalo);
+      var nomesGanhadores = ganhadores.map(function(jogador) {
+        return jogador.nomeJogador;
+      });
+      alert("O jogador " + nomesGanhadores[0] + " venceu!");
+      sorteioEmAndamento = false;
     }
 
-    if (numerosSorteados.length === 75) {
+    if (numerosCartela.length === 75) {
       clearInterval(intervalo);
-      intervalo = null;
-      console.log("Todos os números foram sorteados.");
+
+      if (ganhadores.length === 0) {
+        alert("Não houve ganhadores. O jogo terminou.");
+      }
+
       sorteioEmAndamento = false;
     }
   }, 100);
 }
+
 
 function reiniciarJogo() {
   if (intervalo) {
@@ -148,9 +179,10 @@ function reiniciarJogo() {
   }
 
   jogadores = [];
+  numerosCartela = [];
 
-  var numerosSorteadosDiv = document.getElementById("numeros-sorteados");
-  numerosSorteadosDiv.innerHTML = "";
+  var numerosCartelaDiv = document.getElementById("numeros-sorteados");
+  numerosCartelaDiv.innerHTML = "";
 
   var espacoCartelasDiv = document.getElementById("espaco-cartelas");
   espacoCartelasDiv.innerHTML = "";
@@ -161,31 +193,46 @@ function reiniciarJogo() {
 }
 
 function marcarNumeroSorteado(numero) {
-    var cartelas = document.getElementsByClassName("cartela");
-  
-    for (var i = 0; i < cartelas.length; i++) {
-      var celulas = cartelas[i].getElementsByTagName("td");
-  
-      for (var j = 0; j < celulas.length; j++) {
-        if (celulas[j].innerText === numero.toString()) {
-          celulas[j].classList.add("sorteado");
-        }
+  var cartelas = document.getElementsByClassName("cartela");
+
+  for (var i = 0; i < cartelas.length; i++) {
+    var celulas = cartelas[i].getElementsByTagName("td");
+
+    for (var j = 0; j < celulas.length; j++) {
+      if (celulas[j].innerText === numero.toString()) {
+        celulas[j].classList.add("sorteado");
       }
     }
+  }
 }
 
-function verificarGanhador(numerosSorteados){
-  jogadores.forEach(function(jogador){
-    var quantidade = 0;
-    for(var i = 0; i < jogador.cartela,length; i++){
-      for(var j = 0; j < numerosSorteados.length; j++){
-        if(jogador.cartela[i] == numerosSorteados[j]){
-          quantidade++;
+function verificarGanhadores() {
+  var ganhadores = [];
+
+  if (numerosCartela.length < 25) {
+    return ganhadores;
+  }
+
+  jogadores.forEach(function(jogador) {
+    var ganhou = true;
+
+    for (var i = 0; i < 5; i++) {
+      for (var j = 0; j < 5; j++) {
+        if (!numerosCartela.includes(jogador.cartela[i][j])) {
+          ganhou = false;
+          break;
         }
       }
+
+      if (!ganhou) {
+        break;
+      }
     }
-    if(quantidade == 24){
-      return true;
+
+    if (ganhou) {
+      ganhadores.push(jogador);
     }
-  })
+  });
+
+  return ganhadores;
 }
