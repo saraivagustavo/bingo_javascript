@@ -35,6 +35,12 @@ function gerarCartela() {
     return;
   }
 
+  var regex = /^[A-Za-zÀ-ú]+$/;
+  if (!regex.test(nomeJogador)) {
+    alert("O nome do jogador deve conter apenas letras.");
+    return;
+  }
+
   var jogadorExistente = jogadores.find(function(jogador) {
     return jogador.nomeJogador === nomeJogador;
   });
@@ -156,7 +162,11 @@ function iniciarJogo() {
       });
       alert("Os jogadores vencedores são: " + nomesGanhadores.join(", "));
       sorteioEmAndamento = false;
-    }
+      alert("O jogo acabou. Reiniciando.")
+      setTimeout(function() {
+        reiniciarJogo();
+      }, 2500); 
+}
 
     if (numerosCartela.length === 75) {
       clearInterval(intervalo);

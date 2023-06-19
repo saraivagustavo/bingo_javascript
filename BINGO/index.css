@@ -15,7 +15,8 @@ body {
 }
 
 header {
-    background-color: lightskyblue;
+    background-color: #006494;
+    color: white;
     height: 60px;
     width: 100%;
     display: flex;
@@ -35,7 +36,8 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: lightskyblue;
+    background-color: #006494;
+    color: white;
 }
 
 .container {
@@ -147,6 +149,6 @@ footer {
 
 .jogador {
     display: inline-block;
-    margin-right: 5px;
+    margin-right: 20px;
     margin-top: 15px;
 }
